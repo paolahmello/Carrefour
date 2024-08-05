@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: dbpost
+    ports:
+      - "5432:5432"
+    networks:
+      - backend-network
+
+  backend:
+    build: ./backend
+    ports:
+      - "3001:3001"
+    networks:
+      - backend-network
+    depends_on:
+      - db
+
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - db
+    networks:
+      - backend-network
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - backend-network
+    depends_on:
+      - backend
+
+networks:
+  backend-network:
